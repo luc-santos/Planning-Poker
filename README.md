@@ -1,3 +1,5 @@
+⚠️ **Projeto em construção (WIP - Work in Progress)** 
+
 Projeto Planning-Poker
 
 <img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/1b2e01a3-0a0b-443e-90f3-150659c9874a" />
