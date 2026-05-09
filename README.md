@@ -213,20 +213,20 @@ Session name: Backend API
 
 Add participants
 Type an empty name to finish.
-Participant name: Lucas
 Participant name: Mariana
+Participant name: Lucas
 Participant name:
 
 Available cards:
 0 ½ 1 2 3 5 8 13 20 40 100 ? ∞ ☕
 
 Voting started
-Lucas, choose a card: 5
-Mariana, choose a card: 13
+Mariana, choose a card: 5
+Lucas, choose a card: 13
 
 === Votes ===
-Lucas voted 5
-Mariana voted 13
+Mariana voted 5
+Lucas voted 13
 
 === Result ===
 Total votes: 2
