@@ -1,8 +1,4 @@
-Projeto Planning-Poker
-
-<img width="1024" height="1536" alt="a8e88048-45ed-48a3-9fa4-c7bcefdb84bd" src="https://github.com/user-attachments/assets/ee8ff248-748c-4137-92e1-773f03cbc27e" />
-
-Planning Card
+# Planning Card
 
 Tipo de classe enum, é usado pelos valores serem fixos e conhecidos, evita erros (criar carta inexistente), facilita comparação.
 
@@ -219,7 +215,7 @@ O modelo atual representa uma sala de Planning Poker reutilizável, onde cada ro
 
 O controle de fluxo é baseado no estado revealed, que funciona como uma forma simplificada de gerenciamento de estado da rodada.
 
-PlanningPokerService
+# PlanningPokerService
 
 A classe PlanningPokerService atua como camada intermediária entre a aplicação e as regras de negócio, centralizando operações da sessão e simplificando o fluxo da aplicação.
 
@@ -235,15 +231,21 @@ participantIdCounter = long
 
 Responsável pela geração automática de ids únicos para os participantes adicionados na sessão.
 
-Responsabilidades
-Criar a sessão de planning poker
-Adicionar participantes
-Registrar votos
-Revelar votos
-Reiniciar rodadas
-Gerar o resultado final da votação
-Centralizar o fluxo da aplicação
-Métodos
+---
+
+## Responsabilidades
+
+- Criar a sessão de planning poker
+- Adicionar participantes
+- Registrar votos
+- Revelar votos
+- Reiniciar rodadas
+- Gerar o resultado final da votação
+- Centralizar o fluxo da aplicação
+
+---
+
+## Métodos
 
 createSession(String name)
 
@@ -251,11 +253,15 @@ Cria uma nova sessão de Planning Poker.
 
 Internamente gera um id único para a sessão e instancia um novo PlanningSession.
 
+---
+
 addParticipant(String participantName)
 
 Adiciona um novo participante na sessão.
 
 Gera automaticamente um id incremental para o participante e cria um novo objeto Participant.
+
+---
 
 vote(String participantId, PlanningCard card)
 
@@ -263,11 +269,15 @@ Registra o voto de um participante.
 
 Delegando a responsabilidade para a classe PlanningSession.
 
+---
+
 revealVotes()
 
 Solicita a revelação dos votos da rodada atual.
 
 Delegando a responsabilidade para PlanningSession.
+
+---
 
 resetRound()
 
@@ -275,9 +285,13 @@ Reinicia a rodada atual.
 
 Limpa os votos e reabre a votação.
 
+---
+
 getResult()
 
 Cria e retorna um novo objeto VotingResult baseado nos votos atuais da sessão.
+
+---
 
 getSession()
 
@@ -285,13 +299,17 @@ Retorna a sessão atual da aplicação.
 
 Utilizado principalmente pela camada de interface (PlanningPokerApp).
 
-Observações
+---
+
+## Observações
 
 A classe PlanningPokerService funciona como uma camada de orquestração, separando o fluxo da aplicação das regras do domínio.
 
 Esse padrão facilita manutenção, organização do projeto e futura migração para frameworks como Spring Boot.
 
-VotingResult
+---
+
+# VotingResult
 
 A classe VotingResult representa o resultado final da rodada de votação.
 
@@ -303,18 +321,28 @@ votes = Collection<Vote>
 
 Coleção de votos utilizada para cálculo das estatísticas da rodada.
 
-Responsabilidades
-Calcular média dos votos
-Identificar maior estimativa
-Identificar menor estimativa
-Verificar consenso
-Filtrar votos especiais (?, ☕, ∞)
-Expor os dados finais para exibição
-Regras de Negócio
-Apenas votos numéricos participam dos cálculos
-Votos especiais são ignorados em médias e estatísticas
-Consenso ocorre quando todos os votos numéricos são iguais
-Métodos
+---
+
+## Responsabilidades
+
+- Calcular média dos votos
+- Identificar maior estimativa
+- Identificar menor estimativa
+- Verificar consenso
+- Filtrar votos especiais (?, ☕, ∞)
+- Expor os dados finais para exibição
+
+---
+
+## Regras de Negócio
+
+- Apenas votos numéricos participam dos cálculos
+- Votos especiais são ignorados em médias e estatísticas
+- Consenso ocorre quando todos os votos numéricos são iguais
+
+---
+
+## Métodos
 
 getAverage()
 
@@ -322,13 +350,19 @@ Calcula a média dos votos numéricos.
 
 Ignora votos especiais.
 
+---
+
 getHighestVote()
 
 Retorna o maior valor numérico da rodada.
 
+---
+
 getLowestVote()
 
 Retorna o menor valor numérico da rodada.
+
+---
 
 hasConsensus()
 
@@ -336,11 +370,15 @@ Verifica se todos os votos numéricos possuem o mesmo valor.
 
 Retorna true em caso de consenso.
 
+---
+
 getNumericVotes()
 
 Retorna apenas os votos numéricos da rodada.
 
 Filtrando ?, ☕ e ∞.
+
+---
 
 @Override
 
@@ -349,11 +387,16 @@ Transforma o resultado em texto formatado para exibição no terminal.
 Exemplo:
 
 Average: 5.0
+
 Highest: 8
+
 Lowest: 3
+
 Consensus: false
 
-PlanningPokerApp
+---
+
+# PlanningPokerApp
 
 A classe PlanningPokerApp representa a camada de interface da aplicação via terminal (CLI).
 
@@ -361,19 +404,27 @@ Seu objetivo é controlar o fluxo principal da aplicação e realizar interaçã
 
 A classe utiliza Scanner para leitura de entradas do terminal e delega regras de negócio para PlanningPokerService.
 
-Responsabilidades
-Iniciar o fluxo da aplicação
-Criar sessão
-Coletar participantes
-Exibir cartas disponíveis
-Solicitar votos
-Revelar votos
-Exibir resultado final
-Fluxo da aplicação
+---
+
+## Responsabilidades
+
+- Iniciar o fluxo da aplicação
+- Criar sessão
+- Coletar participantes
+- Exibir cartas disponíveis
+- Solicitar votos
+- Revelar votos
+- Exibir resultado final
+
+---
+
+## Fluxo da aplicação
 
 Cria sessão → Adiciona participantes → Exibe cartas → Coleta votos → Revela votos → Exibe resultado
 
-Métodos
+---
+
+## Métodos
 
 run()
 
@@ -381,21 +432,31 @@ Método principal da aplicação.
 
 Responsável por executar todo o fluxo do Planning Poker.
 
+---
+
 createSession()
 
 Solicita o nome da sessão e cria a sessão utilizando PlanningPokerService.
+
+---
 
 addParticipants()
 
 Coleta participantes via terminal até receber uma entrada vazia.
 
+---
+
 showCards()
 
 Exibe todas as cartas disponíveis do enum PlanningCard.
 
+---
+
 collectVotes()
 
 Percorre todos os participantes da sessão e coleta seus votos.
+
+---
 
 askCard(Participant participant)
 
@@ -404,6 +465,8 @@ Solicita uma carta para um participante específico.
 Valida a entrada utilizando PlanningCard.fromLabel().
 
 Caso inválida, solicita novamente.
+
+---
 
 revealAndShowResult()
 
