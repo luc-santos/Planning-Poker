@@ -1,3 +1,5 @@
+<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/843881c5-9c74-4000-879c-08bf6e87f822" />
+
 # Planning Card
 
 Tipo de classe enum, é usado pelos valores serem fixos e conhecidos, evita erros (criar carta inexistente), facilita comparação.
