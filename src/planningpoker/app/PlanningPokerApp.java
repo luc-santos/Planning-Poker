@@ -22,9 +22,25 @@ public class PlanningPokerApp {
             return;
         }
 
-        showCards();
-        collectVotes();
-        revealAndShowResult();
+        boolean consensus = false;
+
+        while (!consensus) {
+            showCards();
+            collectVotes();
+            revealAndShowResult();
+
+            VotingResult result = service.getResult();
+            consensus = result.hasConsensus();
+
+            if (!consensus) {
+                System.out.println("\nNo consensus reached.");
+                System.out.println("Starting a new round...\n");
+
+                service.resetRound();
+            }
+        }
+
+        System.out.println("\nConsensus reached. Session finished.");
     }
 
     private void createSession() {
