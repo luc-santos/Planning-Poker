@@ -1,356 +1,235 @@
 # Planning Poker
 
-Projeto de Planning Poker desenvolvido em Java com foco em orientação a objetos, modelagem de domínio e separação de responsabilidades.
-
-O sistema simula uma sessão de Planning Poker via terminal (CLI), permitindo criação de sessões, adição de participantes, votação com cartas Fibonacci e múltiplas rodadas até atingir consenso.
+CLI application developed in Java to simulate Agile Planning Poker sessions, focused on object-oriented design, clean architecture, and domain-driven modeling.
 
 ---
 
-# Objetivos do Projeto
+## Features
 
-* Praticar modelagem orientada a objetos
-* Aplicar encapsulamento e imutabilidade
-* Trabalhar com enums, collections e regras de negócio
-* Implementar fluxo de votação baseado em consenso
-* Simular uma arquitetura backend simples em Java
-* Criar uma base sólida antes de avançar para Spring Boot e SQL
-
----
-
-# Tecnologias Utilizadas
-
-* Java
-* IntelliJ IDEA
-* Collections Framework
-* Programação Orientada a Objetos (POO)
+- Create planning sessions
+- Add participants
+- Register votes
+- Reveal voting results
+- Detect consensus
+- Support special cards (?, ☕, ∞)
+- Reset rounds
+- Finish sessions
+- Calculate averages and voting statistics
+- Unit tests with JUnit 5
 
 ---
 
-# Estrutura do Projeto
+## Architecture
+
+The project was designed following object-oriented design principles and responsibility-driven modeling using CRC Cards.
+
+### Main Layers
+
+- `app` → CLI interaction and application flow
+- `service` → application orchestration and coordination
+- `domain` → business rules and entities
+
+- <img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/b94d5815-d1be-472b-8de5-4ed779878c01" />
+
+
+---
+
+## Project Structure
 
 ```text
-src/
-└── planningpoker/
-    ├── Main.java
-    │
-    ├── app/
-    │   └── PlanningPokerApp.java
-    │
-    ├── service/
-    │   └── PlanningPokerService.java
-    │
-    └── domain/
-        ├── Participant.java
-        ├── PlanningCard.java
-        ├── PlanningSession.java
-        ├── Vote.java
-        ├── VotingResult.java
-        └── VotingStatus.java
-```
+src
+├── main
+│   └── java
+│       └── planningpoker
+│           ├── app
+│           ├── domain
+│           ├── service
+│           └── Main.java
+│
+└── test
+    └── java
+        └── planningpoker
+            └── domain
+````
 
----
+## Domain Concepts
 
-# Arquitetura
+PlanningSession
 
-O projeto foi dividido em camadas simples para manter separação de responsabilidades.
+Central entity responsible for:
 
-## app
 
-Responsável pela interação com o usuário via terminal.
+<li>Managing participants</li>
+<li>Controlling voting flow</li>
+<li>Registering votes</li>
+<li>Revealing votes</li>
+<li>Resetting rounds</li>
+<li>Controlling session state</li>
+<li>Participant</li>
 
-Exemplo:
 
-* leitura de dados
-* exibição de resultados
-* controle do fluxo principal da aplicação
+Represents a participant in the planning session.
 
----
+<h2>Responsibilities</h2>
 
-## service
+<li>Store participant identity</li>
+<li>Provide equality comparison through unique ID</li>
+<li>Prevent duplicated logical participants</li>
+<li>Vote</li>
 
-Responsável por orquestrar o fluxo da aplicação.
+Represents the relationship between a participant and a selected planning card.
 
-Centraliza operações como:
+<h2>Responsibilities</h2>
 
-* criação de sessão
-* adição de participantes
-* registro de votos
-* reinício de rodadas
-* geração de resultados
+<li>Link participant and card</li>
+<li>Prevent invalid votes</li>
+<li>Support voting statistics</li>
+<li>PlanningCard</li>
 
----
+Represents available estimation cards.
 
-## domain
+<h2>Responsibilities</h2>
 
-Contém as entidades e regras de negócio do sistema.
 
-Exemplo:
+<li>Store estimation values</li>
+<li>Support special cards (?, ☕, ∞)</li>
+<li>Validate card values</li>
+<li>Support comparisons and statistics</li>
+<li>VotingResult</li>
 
-* participantes
-* votos
-* sessão de planning poker
-* cálculo de resultados
 
----
+Represents the final result of a voting round.
 
-# Fluxo da Aplicação
+<h2>Responsibilities</h2>
 
-```text
-Cria sessão
-→ Adiciona participantes
-→ Exibe cartas disponíveis
-→ Coleta votos
-→ Revela votos
-→ Calcula resultado
-→ Verifica consenso
-→ Reinicia rodada (caso necessário)
-→ Finaliza sessão
-```
 
----
+<li>Calculate average values</li>
+<li>Detect consensus</li>
+<li>Detect discussion scenarios</li>
+<li>Detect special voting situations</li>
+<li>Provide final statistics</li>
+<li>VotingStatus</li>
 
-# Classes Principais
 
-## PlanningCard
+Represents the current state of the session.
 
-Enum responsável pelas cartas do Planning Poker.
+<h2>Possible states</h2>
 
-Cartas disponíveis:
 
-```text
-0 ½ 1 2 3 5 8 13 20 40 100 ? ∞ ☕
-```
+<li>VOTING</li>
+<li>REVEALED</li>
+<li>FINISHED</li>
 
-Responsabilidades:
 
-* representar cartas válidas
-* impedir criação de cartas inexistentes
-* converter entrada do usuário em enum
-* diferenciar cartas numéricas de especiais
+Voting Flow
 
----
+Create Session  
+↓  
+Add Participants  
+↓  
+Start Voting  
+↓  
+Reveal Votes  
+↓  
+Calculate Result  
+↓  
+Reset Round / Finish Session  
 
-## Participant
+<h2>CRC Cards</h2>
 
-Representa um participante da sessão.
+The system design was modeled using CRC (Class-Responsibility-Collaborator) cards.
 
-Possui:
+<h2>Tests</h2>
 
-* id único
-* nome de exibição
+The project includes unit tests covering:
 
-Responsabilidades:
+<li>Participant validation</li>
+<li>Vote validation</li>
+<li>Voting flow</li>
+<li>Session rules</li>
+<li>Voting state transitions</li>
+<li>Planning card behavior</li>
+<li>Equality and hashCode consistency</li>
+<li>Consensus detection</li>
+<li>Special card handling</li>
 
-* identidade do participante
-* comparação via equals/hashCode
-* encapsulamento dos dados
+<h2>Running the Application</h2>
 
----
+Clone repository
 
-## Vote
+``git clone https://github.com/luc-santos/Planning-Poker.git``
 
-Representa um voto individual.
+Open with IntelliJ IDEA  
 
-Conecta:
+Open the project root folder in IntelliJ IDEA.  
 
-* Participant
-* PlanningCard
+Run  
 
-Responsabilidades:
+Execute:  
 
-* armazenar o voto atual do participante
-* validar dados recebidos
-* identificar votos numéricos
+``Main.java``
 
----
+## CLI Preview  
 
-## PlanningSession
-
-Centraliza o controle da rodada.
-
-Responsabilidades:
-
-* gerenciar participantes
-* controlar votos
-* controlar estado da rodada
-* impedir votos após reveal
-* verificar se todos votaram
-* reiniciar rodadas
-
----
-
-## VotingResult
-
-Responsável pelos cálculos da rodada.
-
-Responsabilidades:
-
-* calcular média
-* identificar maior e menor voto
-* verificar consenso
-* detectar cartas especiais
-* gerar status da rodada
-
----
-
-# Regras de Negócio
-
-* Um participante só pode votar se estiver na sessão
-* Cada participante possui apenas um voto por rodada
-* O último voto sobrescreve o anterior
-* Não é permitido votar após reveal
-* A rodada só pode ser revelada quando todos votarem
-* Rodadas reiniciam automaticamente quando não há consenso
-* O sistema finaliza apenas quando existe consenso
-
----
-
-# Exemplo de Execução
-
-```text
+```bash
 === Planning Poker ===
+
 Session name: Backend API
 
-Add participants
-Type an empty name to finish.
 Participant name: Mariana
 Participant name: Lucas
-Participant name:
 
 Available cards:
-0 ½ 1 2 3 5 8 13 20 40 100 ? ∞ ☕
+0 1/2 1 2 3 5 8 13 20 40 100 ? ∞ ☕
 
 Voting started
-Mariana, choose a card: 5
-Lucas, choose a card: 13
+
+Mariana, choose a card:
+Lucas, choose a card:
+
+All participants have voted.
+
+Reveal votes? yes
 
 === Votes ===
+
 Mariana voted 5
-Lucas voted 13
-
-=== Result ===
-Total votes: 2
-Numeric votes: 2
-Average: 9.0
-Consensus: false
-Status: NEEDS_DISCUSSION
-
-No consensus reached.
-Starting a new round...
+Lucas voted 8
 ```
 
----
+## Technologies
 
-# Conceitos Aplicados
+<li>Java</li>
+<li>JUnit 5</li>
+<li>IntelliJ IDEA</li>
 
-* Encapsulamento
-* Imutabilidade
-* Collections
-* Enum
-* equals/hashCode
-* Separação de responsabilidades
-* Modelagem de domínio
-* Arquitetura em camadas
-* Fluxo baseado em estado
+## Future Improvements
 
----
+<li>Multiple voting rounds</li>
+<li>Story/task estimation support</li>
+<li>REST API with Spring Boot</li>
+<li>PostgreSQL persistence</li>
+<li>Docker support</li>
+<li>Real-time voting with WebSockets</li>
+<li>Web interface</li>
+<li>Authentication system</li>
 
-# Possíveis Melhorias Futuras
+## Design Goals
 
-* API REST com Spring Boot
-* Persistência com SQL
-* Histórico de rodadas
-* Interface web
-* WebSocket para votação em tempo real
-* Dockerização
-* Testes unitários completos
-* Autenticação de usuários
+This project was developed to practice:  
 
----
+<li>Object-oriented design</li>
+<li>Responsibility-driven development</li>
+<li>Domain modeling</li>
+<li>Clean architecture principles</li>
+<li>Encapsulation</li>
+<li>Equality and identity handling</li>
+<li>Session state management</li>
+<li>Unit testing</li>
+<li>Java backend fundamentals</li>
 
-# Aprendizados
-
-Este projeto foi desenvolvido com foco em fortalecer fundamentos de backend e orientação a objetos antes da utilização de frameworks.
-
-A ideia principal foi primeiro modelar corretamente o domínio da aplicação em Java puro, garantindo entendimento das regras de negócio e responsabilidades das classes.
-
----
-
-# Como Executar
-
-## Pré-requisitos
-
-* Java JDK 17+ instalado
-* IntelliJ IDEA (opcional)
-* Git instalado
-
----
-
-## Clone o repositório
-
-```bash
-git clone <repository-url>
-```
-
----
-
-## Entre na pasta do projeto
-
-```bash
-cd Planning-Poker
-```
-
----
-
-## Compilando via terminal
-
-No Linux/Mac:
-
-```bash
-javac -d out $(find src -name "*.java")
-```
-
-No Windows (PowerShell):
-
-```powershell
-javac -d out (Get-ChildItem -Recurse -Filter *.java | ForEach-Object { $_.FullName })
-```
-
----
-
-## Executando o projeto
-
-Linux/Mac:
-
-```bash
-java -cp out planningpoker.Main
-```
-
-Windows:
-
-```powershell
-java -cp out planningpoker.Main
-```
-
----
-
-## Executando pelo IntelliJ IDEA
-
-1. Abra o projeto no IntelliJ
-2. Aguarde indexação e configuração do SDK
-3. Abra o arquivo:
-
-```text
-src/planningpoker/Main.java
-```
-
-4. Clique no botão ▶ ao lado do método main
-5. O terminal da aplicação será iniciado automaticamente
-
----
-
-# Autor
+## Author
 
 Lucas Santos Cunha
 
-https://www.linkedin.com/in/lucas-santos-cunha-00673734a/
+linkedin: https://www.linkedin.com/in/lucas-santos-cunha-00673734a/
