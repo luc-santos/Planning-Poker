@@ -57,6 +57,15 @@ class VoteTest {
         Vote vote2 = new Vote(participant, PlanningCard.EIGHT);
 
         assertEquals(vote1, vote2);
+    }
+
+    @Test
+    void shouldReturnSameHashCodeForVotesFromSameParticipant() {
+        Participant participant = new Participant("1", "Mariana");
+
+        Vote vote1 = new Vote(participant, PlanningCard.FIVE);
+        Vote vote2 = new Vote(participant, PlanningCard.EIGHT);
+
         assertEquals(vote1.hashCode(), vote2.hashCode());
     }
 }

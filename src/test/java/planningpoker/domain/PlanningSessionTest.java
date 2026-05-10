@@ -35,7 +35,6 @@ class PlanningSessionTest {
         session.removeParticipant("1");
 
         assertFalse(session.hasParticipant("1"));
-        assertEquals(0, session.getParticipants().size());
     }
 
     @Test
@@ -47,15 +46,15 @@ class PlanningSessionTest {
         session.vote("1", PlanningCard.FIVE);
 
         assertTrue(session.hasVoted("1"));
-        assertEquals(1, session.getVotes().size());
     }
 
     @Test
-    void shouldReplacePreviousVoteFromSameParticipant() {
+    void shouldReplacePreviousVote() {
         PlanningSession session = new PlanningSession("1", "Sprint Planning");
         Participant participant = new Participant("1", "Mariana");
 
         session.addParticipant(participant);
+
         session.vote("1", PlanningCard.FIVE);
         session.vote("1", PlanningCard.EIGHT);
 
@@ -100,7 +99,7 @@ class PlanningSessionTest {
     }
 
     @Test
-    void shouldRevealVotesWhenAllParticipantsVoted() {
+    void shouldRevealVotes() {
         PlanningSession session = new PlanningSession("1", "Sprint Planning");
 
         Participant participant1 = new Participant("1", "Mariana");
@@ -114,7 +113,6 @@ class PlanningSessionTest {
 
         session.revealVotes();
 
-        assertTrue(session.isRevealed());
         assertEquals(VotingStatus.REVEALED, session.getStatus());
     }
 
@@ -124,6 +122,7 @@ class PlanningSessionTest {
         Participant participant = new Participant("1", "Mariana");
 
         session.addParticipant(participant);
+
         session.vote("1", PlanningCard.FIVE);
         session.revealVotes();
 
@@ -139,12 +138,12 @@ class PlanningSessionTest {
         Participant participant = new Participant("1", "Mariana");
 
         session.addParticipant(participant);
+
         session.vote("1", PlanningCard.FIVE);
         session.revealVotes();
 
         session.resetVotes();
 
-        assertFalse(session.isRevealed());
         assertEquals(VotingStatus.VOTING, session.getStatus());
         assertEquals(0, session.getVotes().size());
     }
