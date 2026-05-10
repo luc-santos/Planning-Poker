@@ -8,24 +8,24 @@ class PlanningCardTest {
 
     @Test
     void shouldReturnCardFromValidLabel() {
-        assertEquals(PlanningCard.FIVE, PlanningCard.fromLabel("5"));
-        assertEquals(PlanningCard.COFFEE, PlanningCard.fromLabel("☕"));
-        assertEquals(PlanningCard.QUESTION, PlanningCard.fromLabel("?"));
+        assertEquals(PlanningCard.FIVE, PlanningCard.fromString("5"));
+        assertEquals(PlanningCard.COFFEE, PlanningCard.fromString("☕"));
+        assertEquals(PlanningCard.QUESTION, PlanningCard.fromString("?"));
     }
 
     @Test
     void shouldTrimLabelBeforeConverting() {
-        assertEquals(PlanningCard.EIGHT, PlanningCard.fromLabel(" 8 "));
+        assertEquals(PlanningCard.EIGHT, PlanningCard.fromString(" 8 "));
     }
 
     @Test
     void shouldReturnNullForInvalidLabel() {
-        assertNull(PlanningCard.fromLabel("999"));
+        assertNull(PlanningCard.fromString("999"));
     }
 
     @Test
     void shouldReturnNullForNullLabel() {
-        assertNull(PlanningCard.fromLabel(null));
+        assertNull(PlanningCard.fromString(null));
     }
 
     @Test
