@@ -154,28 +154,28 @@ public class VotingResult {
         return distribution;
     }
 
-    public VotingStatus getStatus() {
+    public VotingOutcome getStatus() {
         if (getNumericVotesCount() == 0 && hasCoffee()) {
-            return VotingStatus.ONLY_COFFEE;
+            return VotingOutcome.ONLY_COFFEE;
         }
 
         if (getNumericVotesCount() == 0) {
-            return VotingStatus.NO_NUMERIC_VOTES;
+            return VotingOutcome.NO_NUMERIC_VOTES;
         }
 
         if (hasInfinity()) {
-            return VotingStatus.TOO_LARGE;
+            return VotingOutcome.TOO_LARGE;
         }
 
         if (hasQuestion()) {
-            return VotingStatus.NEEDS_DISCUSSION;
+            return VotingOutcome.NEEDS_DISCUSSION;
         }
 
         if (hasConsensus()) {
-            return VotingStatus.CONSENSUS;
+            return VotingOutcome.CONSENSUS;
         }
 
-        return VotingStatus.NEEDS_DISCUSSION;
+        return VotingOutcome.NEEDS_DISCUSSION;
     }
 
     @Override

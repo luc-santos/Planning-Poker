@@ -11,7 +11,7 @@ public class PlanningSession {
     private final String name;
     private final Map<String, Participant> participants;
     private final Map<Participant, Vote> votes;
-    private boolean revealed;
+    private VotingStatus status;
 
     public PlanningSession(String id, String name) {
         if (id == null || id.trim().isEmpty()) {
@@ -26,11 +26,15 @@ public class PlanningSession {
         this.name = name.trim();
         this.participants = new LinkedHashMap<>();
         this.votes = new LinkedHashMap<>();
-        this.revealed = false;
+        this.status = VotingStatus.VOTING;
+    }
+
+    public VotingStatus getStatus() {
+        return status;
     }
 
     public void addParticipant(Participant participant) {
-        if (revealed) {
+        if (status == VotingStatus.REVEALED) {
             throw new IllegalStateException("Cannot add participant after votes are revealed");
         }
 
@@ -42,7 +46,7 @@ public class PlanningSession {
     }
 
     public void removeParticipant(String participantId) {
-        if (revealed) {
+        if (status == VotingStatus.REVEALED) {
             throw new IllegalStateException("Cannot remove participant after votes are revealed");
         }
 
@@ -58,8 +62,8 @@ public class PlanningSession {
     }
 
     public void vote(String participantId, PlanningCard card) {
-        if (revealed) {
-            throw new IllegalStateException("Cannot vote after votes are revealed");
+        if (status != VotingStatus.VOTING) {
+            throw new IllegalStateException("Voting is closed");
         }
 
         if (participantId == null || participantId.trim().isEmpty()) {
@@ -111,12 +115,15 @@ public class PlanningSession {
             throw new IllegalStateException("Not all participants voted yet");
         }
 
-        revealed = true;
+       status = VotingStatus.REVEALED;
     }
 
     public void resetVotes() {
+        if(status == VotingStatus.FINISHED) {
+            throw new IllegalStateException("Session is finished");
+        }
         votes.clear();
-        revealed = false;
+        status = VotingStatus.VOTING;
     }
 
     public Collection<Participant> getParticipants() {
@@ -128,7 +135,11 @@ public class PlanningSession {
     }
 
     public boolean isRevealed() {
-        return revealed;
+        return status == VotingStatus.REVEALED;
+    }
+
+    public void finishSession() {
+        status = VotingStatus.FINISHED;
     }
 
     public String getId() {
