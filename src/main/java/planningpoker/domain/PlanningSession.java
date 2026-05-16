@@ -10,7 +10,8 @@ public class PlanningSession {
     private final String id;
     private final String name;
     private final Map<String, Participant> participants;
-    private final Map<Participant, Vote> votes;
+    private final Map<String, Story> stories;
+    private Story currentStory;
     private VotingStatus status;
 
     public PlanningSession(String id, String name) {
@@ -25,17 +26,14 @@ public class PlanningSession {
         this.id = id.trim();
         this.name = name.trim();
         this.participants = new LinkedHashMap<>();
-        this.votes = new LinkedHashMap<>();
+        this.stories = new LinkedHashMap<>();
+        this.currentStory = null;
         this.status = VotingStatus.VOTING;
     }
 
-    public VotingStatus getStatus() {
-        return status;
-    }
-
     public void addParticipant(Participant participant) {
-        if (status == VotingStatus.REVEALED) {
-            throw new IllegalStateException("Cannot add participant after votes are revealed");
+        if (status == VotingStatus.FINISHED) {
+            throw new IllegalStateException("Cannot add participant to a finished session");
         }
 
         if (participant == null) {
@@ -46,42 +44,15 @@ public class PlanningSession {
     }
 
     public void removeParticipant(String participantId) {
-        if (status == VotingStatus.REVEALED) {
-            throw new IllegalStateException("Cannot remove participant after votes are revealed");
+        if (status == VotingStatus.FINISHED) {
+            throw new IllegalStateException("Cannot remove participant from a finished session");
         }
 
         if (participantId == null || participantId.trim().isEmpty()) {
             throw new IllegalArgumentException("Participant id cannot be null or empty");
         }
 
-        Participant participant = participants.remove(participantId.trim());
-
-        if (participant != null) {
-            votes.remove(participant);
-        }
-    }
-
-    public void vote(String participantId, PlanningCard card) {
-        if (status != VotingStatus.VOTING) {
-            throw new IllegalStateException("Voting is closed");
-        }
-
-        if (participantId == null || participantId.trim().isEmpty()) {
-            throw new IllegalArgumentException("Participant id cannot be null or empty");
-        }
-
-        if (card == null) {
-            throw new IllegalArgumentException("Card cannot be null");
-        }
-
-        Participant participant = participants.get(participantId.trim());
-
-        if (participant == null) {
-            throw new IllegalArgumentException("Participant is not in this session");
-        }
-
-        Vote vote = new Vote(participant, card);
-        votes.put(participant, vote);
+        participants.remove(participantId.trim());
     }
 
     public boolean hasParticipant(String participantId) {
@@ -92,22 +63,122 @@ public class PlanningSession {
         return participants.containsKey(participantId.trim());
     }
 
-    public boolean hasVoted(String participantId) {
+    public Participant getParticipant(String participantId) {
         if (participantId == null || participantId.trim().isEmpty()) {
-            return false;
+            throw new IllegalArgumentException("Participant id cannot be null or empty");
         }
 
         Participant participant = participants.get(participantId.trim());
 
         if (participant == null) {
+            throw new IllegalArgumentException("Participant is not in this session");
+        }
+
+        return participant;
+    }
+
+    public void addStory(Story story) {
+        if (status == VotingStatus.FINISHED) {
+            throw new IllegalStateException("Cannot add story to a finished session");
+        }
+
+        if (story == null) {
+            throw new IllegalArgumentException("Story cannot be null");
+        }
+
+        stories.put(story.getId(), story);
+
+        if (currentStory == null) {
+            currentStory = story;
+        }
+    }
+
+    public boolean hasStory(String storyId) {
+        if (storyId == null || storyId.trim().isEmpty()) {
             return false;
         }
 
-        return votes.containsKey(participant);
+        return stories.containsKey(storyId.trim());
+    }
+
+    public Story getStory(String storyId) {
+        if (storyId == null || storyId.trim().isEmpty()) {
+            throw new IllegalArgumentException("Story id cannot be null or empty");
+        }
+
+        Story story = stories.get(storyId.trim());
+
+        if (story == null) {
+            throw new IllegalArgumentException("Story is not in this session");
+        }
+
+        return story;
+    }
+
+    public void selectStory(String storyId) {
+        currentStory = getStory(storyId);
+        status = VotingStatus.VOTING;
+    }
+
+    public void startNewRound() {
+        if (currentStory == null) {
+            throw new IllegalStateException("No story selected");
+        }
+
+        if (status == VotingStatus.FINISHED) {
+            throw new IllegalStateException("Cannot start round in a finished session");
+        }
+
+        int roundNumber = currentStory.getRounds().size() + 1;
+        Round round = new Round(roundNumber);
+
+        currentStory.addRound(round);
+        status = VotingStatus.VOTING;
+    }
+
+    public Round getCurrentRound() {
+        if (currentStory == null) {
+            throw new IllegalStateException("No story selected");
+        }
+
+        if (currentStory.getRounds().isEmpty()) {
+            throw new IllegalStateException("No round started for current story");
+        }
+
+        return currentStory.getRounds()
+                .get(currentStory.getRounds().size() - 1);
+    }
+
+    public void vote(String participantId, PlanningCard card) {
+        Participant participant = getParticipant(participantId);
+
+        Round currentRound = getCurrentRound();
+        currentRound.vote(participant, card);
+    }
+
+    public boolean hasVoted(String participantId) {
+        if (!hasParticipant(participantId)) {
+            return false;
+        }
+
+        try {
+            Participant participant = getParticipant(participantId);
+            return getCurrentRound().hasVoted(participant);
+        } catch (IllegalStateException exception) {
+            return false;
+        }
     }
 
     public boolean allParticipantsVoted() {
-        return !participants.isEmpty() && votes.size() == participants.size();
+        if (participants.isEmpty()) {
+            return false;
+        }
+
+        try {
+            return getCurrentRound().getVotes().size() == participants.size();
+        } catch (IllegalStateException exception) {
+            return false;
+        }
     }
 
     public void revealVotes() {
@@ -115,31 +186,40 @@ public class PlanningSession {
             throw new IllegalStateException("Not all participants voted yet");
         }
 
-       status = VotingStatus.REVEALED;
+        getCurrentRound().reveal();
+        status = VotingStatus.REVEALED;
     }
 
-    public void resetVotes() {
-        if(status == VotingStatus.FINISHED) {
-            throw new IllegalStateException("Session is finished");
-        }
-        votes.clear();
-        status = VotingStatus.VOTING;
+    public void finishSession() {
+        status = VotingStatus.FINISHED;
     }
 
     public Collection<Participant> getParticipants() {
         return new ArrayList<>(participants.values());
     }
 
+    public Collection<Story> getStories() {
+        return new ArrayList<>(stories.values());
+    }
+
+    public Story getCurrentStory() {
+        if (currentStory == null) {
+            throw new IllegalStateException("No story selected");
+        }
+
+        return currentStory;
+    }
+
     public Collection<Vote> getVotes() {
-        return new ArrayList<>(votes.values());
+        return getCurrentRound().getVotes();
     }
 
     public boolean isRevealed() {
         return status == VotingStatus.REVEALED;
     }
 
-    public void finishSession() {
-        status = VotingStatus.FINISHED;
+    public VotingStatus getStatus() {
+        return status;
     }
 
     public String getId() {

@@ -3,15 +3,20 @@ package planningpoker.service;
 import planningpoker.domain.Participant;
 import planningpoker.domain.PlanningCard;
 import planningpoker.domain.PlanningSession;
+import planningpoker.domain.Story;
 import planningpoker.domain.VotingResult;
 
 public class PlanningPokerService {
 
     private PlanningSession session;
     private int participantIdCounter = 1;
+    private int storyIdCounter = 1;
 
     public PlanningSession createSession(String name) {
         session = new PlanningSession("session-1", name);
+        participantIdCounter = 1;
+        storyIdCounter = 1;
+
         return session;
     }
 
@@ -27,6 +32,31 @@ public class PlanningPokerService {
         participantIdCounter++;
 
         return participant;
+    }
+
+    public Story addStory(String title, String description) {
+        ensureSessionExists();
+
+        Story story = new Story(
+                String.valueOf(storyIdCounter),
+                title,
+                description
+        );
+
+        session.addStory(story);
+        storyIdCounter++;
+
+        return story;
+    }
+
+    public void selectStory(String storyId) {
+        ensureSessionExists();
+        session.selectStory(storyId);
+    }
+
+    public void startNewRound() {
+        ensureSessionExists();
+        session.startNewRound();
     }
 
     public void vote(String participantId, PlanningCard card) {
@@ -46,12 +76,27 @@ public class PlanningPokerService {
             throw new IllegalStateException("Votes must be revealed before getting result");
         }
 
-        return new VotingResult(session.getVotes());
+        return session.getCurrentRound().calculateResult();
     }
 
     public void resetRound() {
         ensureSessionExists();
-        session.resetVotes();
+
+        if (!session.isRevealed()) {
+            throw new IllegalStateException("Current round must be revealed before starting a new one");
+        }
+
+        session.startNewRound();
+    }
+
+    public void defineFinalEstimate(PlanningCard card) {
+        ensureSessionExists();
+        session.getCurrentStory().defineFinalEstimate(card);
+    }
+
+    public void finishSession() {
+        ensureSessionExists();
+        session.finishSession();
     }
 
     public PlanningSession getSession() {
