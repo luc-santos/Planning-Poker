@@ -29,8 +29,8 @@ The project was designed following object-oriented design principles and respons
 - `service` → application orchestration and coordination
 - `domain` → business rules and entities
 
-- <img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/b94d5815-d1be-472b-8de5-4ed779878c01" />
 
+<img width="1024" height="1536" alt="planning-poker-UML" src="https://github.com/user-attachments/assets/443cd1ed-c9ac-4261-8452-9062b10e3625" />
 
 ---
 
